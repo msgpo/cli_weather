@@ -11,9 +11,9 @@ import sys
 import logging
 log = logging.getLogger(__name__)
 
-import globals
-from data_types.config import WeatherConfig
-from data_types.report import WeatherReport
+import rhasspy_weather.globals as globals
+from rhasspy_weather.data_types.config import WeatherConfig
+from rhasspy_weather.data_types.report import WeatherReport
 
 # hack to allow correct locale to be used in argparse
 syspath_backup = sys.path
@@ -64,4 +64,4 @@ def parse():
 
 
 if __name__ == '__main__':
-    raise Exception("cli cannot be called from here, call package")
+    parse()
