@@ -5,9 +5,9 @@ It depends on https://github.com/ulno/rhasspy_weather which is forked from https
 
 To use clone the following way: 
 ```bash
-git clone -R https://github.com/ulno/cli_weather
+git clone --recursive https://github.com/ulno/cli_weather
 ```
-Don't forget to use -R to get the dependencies.
+Don't forget to use ``--recursive`` to get the dependencies.
 
 To run, run
 ```bash
