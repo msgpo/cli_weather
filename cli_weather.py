@@ -9,11 +9,14 @@ Command line interface for rhasspy_weather.
 import sys
 
 import logging
+logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 import rhasspy_weather.globals as globals
 from rhasspy_weather.data_types.config import WeatherConfig
 from rhasspy_weather.data_types.report import WeatherReport
+
+from cli_parser import parse_cli_args
 
 # hack to allow correct locale to be used in argparse
 syspath_backup = sys.path
@@ -22,7 +25,6 @@ for p in syspath_backup:
     if "weather" not in p:
         sys.path.append(p)
 import argparse
-
 
 # function being called when snips detects an intent related to the weather
 def get_weather_forecast(args):
@@ -34,7 +36,8 @@ def get_weather_forecast(args):
         return config.status.status_response()
 
     log.info("Parsing rhasspy intent")
-    request = config.parser.parse_cli_args(args)
+#    request = config.parser.parse_cli_args(args)  # if the parser got moved to rhasspy_weather it would be called like this
+    request = parse_cli_args(args)
     if request.status.is_error:
         return request.status.status_response()
 
@@ -51,7 +54,7 @@ def get_weather_forecast(args):
 
 def parse():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--day', help='Forecast day.')  # when_day
+    parser.add_argument('-d', '--day', help='Forecast day (sunday, monday, ...) or "day month".')  # when_day
     parser.add_argument('-t', '--time', help='Forecast time')  # when_time
     parser.add_argument('-l', '--location', help='Forecast location')  # location
     parser.add_argument('-i', '--item', help='Is a specific item (like umbrella) needed/recommended.')  # item

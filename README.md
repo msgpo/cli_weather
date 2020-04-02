@@ -15,3 +15,4 @@ python3 cli_weather.py --help
 ```
 
 TODO: list options here
+dependency on arch (for rhasspy weather): python-suntime
