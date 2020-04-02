@@ -6,6 +6,7 @@ from rhasspy_weather.data_types.location import Location
 from rhasspy_weather.data_types.request import WeatherRequest, DateType, ForecastType, Grain
 from rhasspy_weather.data_types.status import StatusCode
 
+#log = logging.getLogger(__name__)
 log = logging.getLogger(__name__)
 
 
@@ -14,10 +15,10 @@ def parse_cli_args(args):
 
     from rhasspy_weather.globals import config
 
-    if args.day is not None:
-        intent = ForecastType.CONDITION
-    elif args.item is not None:
+    if args.item is not None:
         intent = ForecastType.ITEM
+    elif args.day is not None or args.condition is not None:
+        intent = ForecastType.CONDITION
     elif args.temperature is not None:
         intent = ForecastType.TEMPERATURE
     else:
@@ -31,7 +32,7 @@ def parse_cli_args(args):
     # if a day was specified
     arg_day = args.day
     if arg_day is not None:
-        log.debug("it was a day specified")
+        log.debug("it was a day specified: {0}".format(arg_day))
         arg_day = arg_day.lower()
         named_days_lowercase = [x.lower() for x in config.locale.named_days]
         weekdays_lowercase = [x.lower() for x in config.locale.weekday_names]
@@ -43,7 +44,7 @@ def parse_cli_args(args):
             value = list(config.locale.named_days.values())[index]
             if isinstance(value, datetime.date):
                 log.debug("    named day seems to be a date")
-                new_request.status.set_status(StatusCode.NOT_IMPLEMENTET_ERROR)
+                new_request.status.set_status(StatusCode.NOT_IMPLEMENTED_ERROR)
             elif isinstance(value, int):
                 log.debug("    named day seems to be an offset from today")
                 new_request.request_date = datetime.date.today() + datetime.timedelta(value)
@@ -76,11 +77,11 @@ def parse_cli_args(args):
                 except ValueError:
                     new_request.status.set_status(StatusCode.DATE_ERROR)
 
-        # if a time was specified
+        # if a time was specified - this is only evaluated if day was given - TODO: why? decouple!
         arg_time = args.time
         if arg_time is not None:
             arg_time = arg_time.lower()
-            log.debug("it was a time specified")
+            log.debug("it was a time specified: {0}".format(arg_time))
             new_request.grain = Grain.HOUR
 
             named_times_lowercase = [x.lower() for x in config.locale.named_times]
@@ -88,8 +89,8 @@ def parse_cli_args(args):
             named_times_combined = named_times_lowercase + named_times_synonyms_lowercase
             # was something like midday specified (listed in locale.named_times or in locale.named_times_synonyms)?
             if arg_time in named_times_combined:
-                log.debug("  named time frame detected")
-                if arg_time.lower() in named_times_synonyms_lowercase:
+                log.debug("  named time frame detected: {0}".format(arg_time))
+                if arg_time in named_times_synonyms_lowercase:
                     index = named_times_synonyms_lowercase.index(arg_time)
                     name = list(config.locale.named_times_synonyms.keys())[index]
                     value = config.locale.named_times[config.locale.named_times_synonyms[name]]
@@ -100,7 +101,8 @@ def parse_cli_args(args):
                 log.debug(value)
                 if isinstance(value, datetime.time):
                     log.debug("    named time seems to be a certain time")
-                    new_request.status.set_status(StatusCode.NOT_IMPLEMENTET_ERROR)
+                    new_request.start_time = value
+                    new_request.time_specified = name
                 elif isinstance(value, tuple):
                     log.debug("    named time seems to be an interval")
                     new_request.date_type = DateType.INTERVAL
@@ -110,7 +112,7 @@ def parse_cli_args(args):
             # was it hours and minutes (specified as "HH MM" by rhasspy intent)?
             elif ' ' in arg_time:
                 log.debug("    hours and minutes detected")
-                new_request.start_time = datetime.datetime.strptime(args["time"], '%H %M').time()
+                new_request.start_time = datetime.datetime.strptime(arg_time, '%H %M').time()
                 new_request.time_specified = config.locale.format_userdefined_time(new_request.start_time.hour, new_request.start_time.minute)
             # is it only an hour (no way to only specify minutes, if it is an int, it is hours)?
             elif arg_time.isdigit():
@@ -129,18 +131,25 @@ def parse_cli_args(args):
     arg_condition = args.condition
     arg_item = args.item
     arg_temperature = args.temperature
-    if arg_condition is not None:
+    log.debug("intent: {}".format(intent))
+    if intent == ForecastType.CONDITION:
         arg_condition = arg_condition.lower()
+        log.debug("condition requested: {}".format(arg_condition))
         if arg_condition in config.locale.requested_condition:
             requested = config.locale.requested_condition[arg_condition]
         else:
             requested = ConditionType.UNKNOWN
-    elif arg_item is not None:
-        requested = arg_item.capitalize()
-    elif arg_temperature is not None:
+        log.debug("condition type derived: {}".format(requested))
+    elif intent == ForecastType.ITEM:
+        log.debug("item requested: {}".format(arg_item))
+        requested = arg_item.lower() # uses capitalize in rhasspy_intent -> TODO: report consistency problem - using lower, works for English
+    elif intent == ForecastType.TEMPERATURE:
         arg_temperature = arg_temperature.lower()
+        log.debug("temperature condition requested: {}".format(arg_temperature))
+        print(config.locale.requested_temperature)
         if arg_temperature in config.locale.requested_temperature:
             requested = config.locale.requested_temperature[arg_temperature]
+        log.debug("temperature condition selected: {}".format(requested))
 
     if requested is not None:
         log.debug("there was a special request made")

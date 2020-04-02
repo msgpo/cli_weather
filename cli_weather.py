@@ -60,6 +60,7 @@ def parse():
     parser.add_argument('-i', '--item', help='Is a specific item (like umbrella) needed/recommended.')  # item
     parser.add_argument('-c', '--condition', help='Is a specific condition active at given time.')  # condition
     parser.add_argument('-e', '--temperature', help='Temperature forecast.')  # temperature
+    parser.add_argument('-j', '--json', help="Receive json in rhasspy intent event format and forward that to rhasspy_weather component.")
 
     args = parser.parse_args()
     sys.path = syspath_backup  # restore sys path to allow local locale to be used
