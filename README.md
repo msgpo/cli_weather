@@ -1,5 +1,5 @@
 # cli_weather
-A command line clinet ot give you a written weather forecast for different requests.
+A command line client to give you a written weather forecast for different requests. This forecast can then be piped into a speech to text tool and played via a voice assistant or smart speaker.
 
 It depends on https://github.com/ulno/rhasspy_weather which is forked from https://github.com/Daenara/rhasspy_weather
 
@@ -14,5 +14,8 @@ To run, run
 python3 cli_weather.py --help
 ```
 
-TODO: list options here
-dependency on arch (for rhasspy weather): python-suntime
+TODO: list options+explanations here
+
+## Notes
+
+- dependency on arch (for rhasspy weather): python-suntime
