@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 # project specific ignores
+# don't touch submodule, even if I change things
 rhasspy_weather.orig
+rhasspy_weather
