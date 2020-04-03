@@ -62,10 +62,14 @@
         "thunder:thunderstorm",
         "lightning:thunderstorm",
         "sun",
-        "sun shine:sun",
-        "sun shining:sun",
+        "(sun shine):sun",
+        "(sun shining):sun",
+        "(sun be shining):sun",
+        "sunny:sun",
         "wind",
-        "storming:wind"
+        "windy:wind",
+        "storming:wind",
+        "stormy:wind"
     ],
     "places": [
         "Aachen",
