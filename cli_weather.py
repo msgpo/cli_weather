@@ -20,15 +20,16 @@ from rhasspy_weather.data_types.report import WeatherReport
 from cli_parser import parse_cli_args
 from rhasspy_weather.parser.rhasspy_intent import parse_intent_message
 
-# hack to allow correct locale to be used in argparse - TODO: check, might me obsolete due to changes upstream
-syspath_backup = sys.path
-sys.path=[]
-for p in syspath_backup:
-    if "weather" not in p:
-        sys.path.append(p)
+# # hack to allow correct locale to be used in argparse - TODO: check, might me obsolete due to changes upstream
+# syspath_backup = sys.path
+# sys.path=[]
+# for p in syspath_backup:
+#     if "weather" not in p:
+#         sys.path.append(p)
 import argparse
 
-# function being called when snips detects an intent related to the weather
+
+# handling the steps necessary to do a forecast
 def get_weather_forecast(args):
     log.info("Loading Config")
     globals.config = WeatherConfig()
@@ -38,8 +39,19 @@ def get_weather_forecast(args):
         return config.status.status_response()
 
     log.info("Parsing rhasspy intent")
-#    request = config.parser.parse_cli_args(args)  # if the parser got moved to rhasspy_weather it would be called like this
-    request = parse_cli_args(args)
+
+    if args.json is not None:
+        if args.json == "-":
+            # read and parse json from stdin and send it to rhasspy_weather
+            data = json.load(sys.stdin)
+        else:
+            data = json.loads(args.json)
+        request = parse_intent_message(data)
+    else:
+#        request = config.parser.parse_cli_args(args)  # if the parser got moved to rhasspy_weather it would be called like this
+        request = parse_cli_args(args)
+
+
     if request.status.is_error:
         return request.status.status_response()
 
@@ -62,16 +74,11 @@ def parse():
     parser.add_argument('-i', '--item', help='Is a specific item (like umbrella) needed/recommended.')  # item
     parser.add_argument('-c', '--condition', help='Is a specific condition active at given time.')  # condition
     parser.add_argument('-e', '--temperature', help='Temperature forecast.')  # temperature
-    parser.add_argument('-j', '--json', action='store_true', help="Receive json in rhasspy intent event format via stdin and forward that to rhasspy_weather component.")
+    parser.add_argument('-j', '--json', help="Receive json in rhasspy intent event format as one parameter string or via stdin when this is set to a dash (-) and forward that to rhasspy_weather component.")
 
     args = parser.parse_args()
-    sys.path = syspath_backup  # restore sys path to allow local locale to be used - TODO: still necessary?
-    if args.json is not None:
-        # read and parse json from stdin and send it to rhasspy_weather
-        data = json.load(sys.stdin)
-        print(parse_intent_message(data))
-    else:
-        print(get_weather_forecast(args))
+    # sys.path = syspath_backup  # restore sys path to allow local locale to be used - TODO: still necessary?
+    print(get_weather_forecast(args))
 
 
 if __name__ == '__main__':
