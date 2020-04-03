@@ -7,6 +7,7 @@ Command line interface for rhasspy_weather.
 
 
 import sys
+import json
 
 import logging
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
@@ -17,8 +18,9 @@ from rhasspy_weather.data_types.config import WeatherConfig
 from rhasspy_weather.data_types.report import WeatherReport
 
 from cli_parser import parse_cli_args
+from rhasspy_weather.parser.rhasspy_intent import parse_intent_message
 
-# hack to allow correct locale to be used in argparse
+# hack to allow correct locale to be used in argparse - TODO: check, might me obsolete due to changes upstream
 syspath_backup = sys.path
 sys.path=[]
 for p in syspath_backup:
@@ -60,11 +62,16 @@ def parse():
     parser.add_argument('-i', '--item', help='Is a specific item (like umbrella) needed/recommended.')  # item
     parser.add_argument('-c', '--condition', help='Is a specific condition active at given time.')  # condition
     parser.add_argument('-e', '--temperature', help='Temperature forecast.')  # temperature
-    parser.add_argument('-j', '--json', help="Receive json in rhasspy intent event format and forward that to rhasspy_weather component.")
+    parser.add_argument('-j', '--json', action='store_true', help="Receive json in rhasspy intent event format via stdin and forward that to rhasspy_weather component.")
 
     args = parser.parse_args()
-    sys.path = syspath_backup  # restore sys path to allow local locale to be used
-    print(get_weather_forecast(args))
+    sys.path = syspath_backup  # restore sys path to allow local locale to be used - TODO: still necessary?
+    if args.json is not None:
+        # read and parse json from stdin and send it to rhasspy_weather
+        data = json.load(sys.stdin)
+        print(parse_intent_message(data))
+    else:
+        print(get_weather_forecast(args))
 
 
 if __name__ == '__main__':
