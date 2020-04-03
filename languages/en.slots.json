@@ -19,7 +19,8 @@
         "at the moment: now"
     ],
     "weather_items": [
-        "rain coat",
+        "raincoat",
+        "rain coat:raincoat",
         "hat",
         "wool hat",
         "hoodie",
@@ -37,8 +38,9 @@
         "sneakers",
         "scarf",
         "winter boots",
-        "sun glasses",
         "winter coat",
+        "sunglasses",
+        "sun glasses:sunglasses",
         "pair of sandals",
         "cap",
         "pair of winter boots",

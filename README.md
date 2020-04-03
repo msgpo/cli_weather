@@ -18,4 +18,6 @@ TODO: list options+explanations here
 
 ## Notes
 
-- dependency on arch (for rhasspy weather): python-suntime
+- Do not forget to configure config.ini in rhasspy_weather
+- Make sure to have all dependencies installed: dependency on arch (for rhasspy weather): python-suntime (AUR), python-pytz
+- If you want to send the event message from rhasspy out of node-red to an exec node, use a JSONata change with content ``"'" & json_message & "'"``. Put ``python3 <install_path>/cli_weather/cli_weather.py --json `` as command into the exec node and check to append the payload.

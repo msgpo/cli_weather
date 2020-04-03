@@ -10,7 +10,7 @@ import sys
 import json
 
 import logging
-logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
 import rhasspy_weather.globals as globals
