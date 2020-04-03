@@ -146,7 +146,6 @@ def parse_cli_args(args):
     elif intent == ForecastType.TEMPERATURE:
         arg_temperature = arg_temperature.lower()
         log.debug("temperature condition requested: {}".format(arg_temperature))
-        print(config.locale.requested_temperature)
         if arg_temperature in config.locale.requested_temperature:
             requested = config.locale.requested_temperature[arg_temperature]
         log.debug("temperature condition selected: {}".format(requested))
