@@ -1,10 +1,11 @@
 import datetime
 import logging
 
+from rhasspy_weather import utils
 from rhasspy_weather.data_types.condition import ConditionType
 from rhasspy_weather.data_types.location import Location
 from rhasspy_weather.data_types.request import WeatherRequest, DateType, ForecastType, Grain
-from rhasspy_weather.data_types.status import StatusCode
+from rhasspy_weather.data_types.config import get_config
 
 #log = logging.getLogger(__name__)
 log = logging.getLogger(__name__)
@@ -13,7 +14,7 @@ log = logging.getLogger(__name__)
 def parse_cli_args(args):
     intent = None
 
-    from rhasspy_weather.globals import config
+    config = get_config()
 
     if args.item is not None:
         intent = ForecastType.ITEM

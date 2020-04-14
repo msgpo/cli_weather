@@ -13,9 +13,8 @@ import logging
 logging.basicConfig(format='%(levelname)s: %(message)s', level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
-import rhasspy_weather.globals as globals
-from rhasspy_weather.data_types.config import WeatherConfig
 from rhasspy_weather.data_types.report import WeatherReport
+from rhasspy_weather.data_types.config import get_config
 
 from cli_parser import parse_cli_args
 from rhasspy_weather.parser.rhasspy_intent import parse_intent_message
@@ -31,13 +30,11 @@ import argparse
 
 # handling the steps necessary to do a forecast
 def get_weather_forecast(args):
-    log.info("Loading Config")
-    globals.config = WeatherConfig()
-    config = globals.config
+    config = get_config()
 
-    if config.status.is_error:
-        return config.status.status_response()
-
+    if config is None:
+        return "Configuration could not be read. Please make sure everything is set up correctly"
+    
     log.info("Parsing rhasspy intent")
 
     if args.json is not None:
